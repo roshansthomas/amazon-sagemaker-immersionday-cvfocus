@@ -1,0 +1,120 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: IAM Policies, and SageMaker Notebook to work with SageMaker Immersion Day CV.
+
+Metadata: 
+  AWS::CloudFormation::Interface: 
+    ParameterGroups: 
+      - 
+        Label: 
+          default: "Notebook Configuration"
+        Parameters: 
+          - NotebookName
+          - NotebookInstanceType
+          - VolumeSize
+          - CodeRepository
+      - 
+        Label: 
+          default: "Notebook Lifecycle Configuration"
+        Parameters: 
+          - NotebookLifecycleName
+          - NotebookLifecycleOnStart
+
+Parameters:
+
+  NotebookName:
+    Type: String
+    Default: sagemaker-immersion-day-cv
+    Description: Enter the name of the SageMaker notebook instance. Default is sagemaker-immersion-day-cv.
+
+  VolumeSize:
+    Type: Number
+    Default: 30
+    MinValue: 20
+    MaxValue: 16384
+    ConstraintDescription: Must be an integer between 30 (GB) and 16384 (16 TB).
+    Description: Enter the size of the EBS volume in GB.
+
+  CodeRepository:
+    Type: String
+    Default: https://github.com/roshansthomas/amazon-sagemaker-immersionday-cvfocus.git
+    Description: Code respository to use with notebook
+
+  NotebookInstanceType:
+    Type: String
+    Default: ml.g4dn.4xlarge
+    Description: Enter the SageMaker notebook instance type. Default is ml.g4dn.4xlarge.
+
+  NotebookLifecycleName:
+    Type: String
+    Default: sagemaker-immersion-day-lifecycle
+    Description: Notebook lifecycle name. Default is sagemaker-immersion-day-lifecycle
+
+  NotebookLifecycleOnStart:
+    Type: String
+    Default: |
+      #!/bin/bash
+
+      set -e
+
+      # Install required library
+      nohup sudo -b -u ec2-user -i <<'EOF'
+      # PARAMETERS
+      ENVIRONMENT=amazonei_pytorch_latest_p37
+      
+      conda install -c conda-forge rtree geopandas gdal=3.0.3 --name "$ENVIRONMENT" --yes
+
+      source /home/ec2-user/anaconda3/bin/activate "$ENVIRONMENT"
+      pip install pip install solaris 
+      source /home/ec2-user/anaconda3/bin/deactivate
+
+      EOF
+
+    Description: Notebook lifecycle.
+
+  NotebookPlatformIdentifier:
+    Type: String
+    Default: notebook-al2-v1
+    Description: Notebook platform identifier.
+
+Resources:
+  # SageMaker Execution Role
+  SageMakerIamRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              Service: sagemaker.amazonaws.com
+            Action: sts:AssumeRole
+      Path: "/"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/AmazonSageMakerFullAccess"
+        - "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+        - "arn:aws:iam::aws:policy/IAMFullAccess"
+
+  # SageMaker lifecycle
+  NotebookLifecycle:
+    Type: "AWS::SageMaker::NotebookInstanceLifecycleConfig"
+    Properties: 
+      NotebookInstanceLifecycleConfigName: !Ref NotebookLifecycleName
+      OnStart: 
+        - Content:
+            Fn::Base64: !Ref NotebookLifecycleOnStart
+
+  # SageMaker notebook
+  NotebookInstance:
+    Type: "AWS::SageMaker::NotebookInstance"
+    Properties:
+      InstanceType: !Ref NotebookInstanceType
+      NotebookInstanceName: !Ref NotebookName
+      RoleArn: !GetAtt SageMakerIamRole.Arn
+      VolumeSizeInGB: !Ref VolumeSize
+      DefaultCodeRepository: !Ref CodeRepository
+      LifecycleConfigName: !GetAtt NotebookLifecycle.NotebookInstanceLifecycleConfigName
+      PlatformIdentifier: !Ref NotebookPlatformIdentifier
+ 
