@@ -24,7 +24,24 @@ Python is used as the programming language for all the labs and participants are
 
 Lab 1) Using SageMaker Semantic Segmentation algorithm
 
-Lab 2) Bring your own training script  to train and deploy on SageMaker
+Lab 2) Bring your own training script to train and deploy on SageMaker
+
+## Lab 2
+
+In this lab, we will train a machine learning model using the bring your own script method. We will train a model using user-defined u-net model implemented with the MX-Net framework and train a semantic segmentation model from the torch vision model zoo using the pytorch framework.
+
+### Setup
+
+Before we begin, we will setup an Amazon SageMaker Notebook which will pre-install some packages required to convert the SpaceNet dataset from geojson into images using the Solaris library. This can be done by deploying the lab2.yml cloudformation template in your account.
+
+1. Download the [lab2.yml](./lab2.yml) file
+2. In your AWS account, go to [Cloudformation](https://ap-southeast-2.console.aws.amazon.com/cloudformation/home?region=ap-southeast-2#/)
+3. Next click `Create Stack`
+4. Upload a template, select the lab2.yml file and click next.
+5. Provide the stack with a name (i.e. immersion-day-lab2)
+6. Click `Next` twice and tick the checkbox to acknowledge creation of IAM resources and click `Create Stack`
+
+Note: This setup will take at approximate 20 minutes to install the conda packages in the Amazon SageMaker notebook.
 
 ## Security
 
