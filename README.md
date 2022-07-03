@@ -26,22 +26,26 @@ Lab 1) Using SageMaker Semantic Segmentation algorithm
 
 Lab 2) Bring your own training script to train and deploy on SageMaker
 
-## Lab 2
-
-In this lab, we will train a machine learning model using the bring your own script method. We will train a model using user-defined u-net model implemented with the MX-Net framework and train a semantic segmentation model from the torch vision model zoo using the pytorch framework.
-
 ### Setup
 
-Before we begin, we will setup an Amazon SageMaker Notebook which will pre-install some packages required to convert the SpaceNet dataset from geojson into images using the Solaris library. This can be done by deploying the lab2.yml cloudformation template in your account.
+Before we begin, it is recommended you deploy the [lab2.yml](./lab2.yml) cloudformation template. The template will deploy an Amazon SageMaker Notebook with pre-installed packages which are prerequisites for lab 2. Specifically, in lab 2, we will convert the SpaceNet dataset from geojson format into images using the [Solaris](https://solaris.readthedocs.io/en/latest/) library. The steps are as follows:
 
-1. Download the [lab2.yml](./lab2.yml) file
-2. In your AWS account, go to [Cloudformation](https://ap-southeast-2.console.aws.amazon.com/cloudformation/home?region=ap-southeast-2#/)
+1. Download the [lab2.yml](./lab2.yml) file onto your computer.
+2. In your AWS account, go to the Cloudformation service.
 3. Next click `Create Stack`
-4. Upload a template, select the lab2.yml file and click next.
-5. Provide the stack with a name (i.e. immersion-day-lab2)
+4. Select `Upload a template`, select the lab2.yml file and click `next`.
+5. Provide the stack with a name (i.e. immersion-day-lab2).
 6. Click `Next` twice and tick the checkbox to acknowledge creation of IAM resources and click `Create Stack`
 
-Note: This setup will take at approximate 20 minutes to install the conda packages in the Amazon SageMaker notebook.
+Note: This setup will take at approximate 20 minutes to install the conda packages in the Amazon SageMaker notebook, so we will begin with lab 1 first.
+
+## Lab 2
+
+In this lab, we will train a machine learning model using the bring your own script method. We will train a model using user-defined u-net model implemented with the MXNet framework and also train a semantic segmentation model from the torch vision model zoo using the pytorch framework.
+
+1. To begin, go to SageMaker Notebooks and open the notebook named `sagemaker-immersion-day-cv` by clicking the JupyterLab link
+2. In the file explorer view, open the directory amazon-sagemaker-immersionday-cvfocus/lab2
+3. We will begin with the u-net model by opening the notebook `1. SpaceNet-Workshop.ipynb`. Run through the notebook and when you kick off the training of your u-net model, open the next notebook to learn how to train a torch vision model `2. torchvision-semantic-segmentation.ipynb` as the training will take approximately 15 minutes. 
 
 ## Security
 
